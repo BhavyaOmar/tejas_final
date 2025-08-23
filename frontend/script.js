@@ -1,7 +1,8 @@
-const sensorData = [
-            { id: 'SNS-001', lat: 22.4064, lng: 88.9781, temp: 28.5, humidity: 65, smoke: 15, ldr: 850, status: 'online' },
-            ];
-
+// A simple in-memory store for sensor data
+// This is for demonstration; in a production app, you'd use a database.
+let sensorData = [
+  { id: 'SNS-001', lat: 22.4064, lng: 88.9781, temp: 28.5, humidity: 65, smoke: 15, ldr: 850, status: 'online' },
+];
 // Add a new sensor at current location
 function addSensor() {
   if (navigator.geolocation) {
