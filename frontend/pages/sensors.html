@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TEJAS</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"
+    />
+    <link rel="stylesheet" href="../style.css" />
+  </head>
+  <body>
+    <nav>
+      <a href="../index.html" class="logo">TEJAS</a>
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link active">Sensors</a></li>
+        <li><a href="#broadcast" class="nav-link">Broadcast</a></li>
+        <li><a href="#alerts" class="nav-link">Notifications</a></li>
+      </ul>
+    </nav>
+    <div id="sensors" class="page">
+      <div class="page-header">
+        <h1>Sensors List</h1>
+      </div>
+
+      <div class="sensors-info-container">
+        <div class="sensor-grid" id="sensor-grid">
+          <!-- Sensors will be loaded here -->
+        </div>
+        <div class="sensors-info-container"></div>
+      </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="../script.js"></script>
+  </body>
+</html>
