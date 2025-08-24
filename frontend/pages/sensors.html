@@ -8,31 +8,159 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"
     />
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link rel="stylesheet" href="../style.css" />
   </head>
   <body>
     <nav>
       <a href="../index.html" class="logo">TEJAS</a>
       <ul class="nav-links">
-        <li><a href="#" class="nav-link active">Sensors</a></li>
-        <li><a href="#broadcast" class="nav-link">Broadcast</a></li>
-        <li><a href="#alerts" class="nav-link">Notifications</a></li>
-      </ul>
+        <li><a href="./sensors.html" class="nav-link active">Analysis</a></li>
+        </ul>
     </nav>
     <div id="sensors" class="page">
       <div class="page-header">
         <h1>Sensors List</h1>
       </div>
 
-      <div class="sensors-info-container">
-        <div class="sensor-grid" id="sensor-grid">
-          <!-- Sensors will be loaded here -->
-        </div>
-        <div class="sensors-info-container"></div>
-      </div>
-    </div>
-    
+      <!-- Recent Data -->
+    <div class="card">
+    <p><b>LDR:</b> <span id="ldr">--</span></p>
+    <p><b>Temperature:</b> <span id="temp">--</span>°C</p>
+    <p><b>Smoke:</b> <span id="smoke">--</span></p>
+    <p id="status">Loading...</p>
+    <p><small>Last Updated: <span id="timestamp">--</span></small></p>
+  </div>
+
+       <div class="card">
+    <h2>Temperature (°C)</h2>
+    <canvas id="tempGraph" height="250"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>LDR (Light Sensor)</h2>
+    <canvas id="ldrGraph" height="250"></canvas>
+  </div>
+
+  <div class="card">
+    <h2>Humidity</h2>
+    <canvas id="humidityGraph" height="250"></canvas>
+  </div>
+
+  
+  <button id="clear">🧹 Clear Graphs</button>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
     <script src="../script.js"></script>
+     <script>
+	let history = JSON.parse(localStorage.getItem("history")) || [];
+
+// Setup charts
+const tempChart = new Chart(document.getElementById("tempGraph"), {
+  type: 'line',
+  data: { labels: [], datasets: [{ label: "Temperature (°C)", data: [], borderColor: "orange", fill: false }] },
+  options: chartOptions("°C")
+});
+
+const ldrChart = new Chart(document.getElementById("ldrGraph"), {
+  type: 'line',
+  data: { labels: [], datasets: [{ label: "LDR", data: [], borderColor: "cyan", fill: false }] },
+  options: chartOptions("")
+});
+
+const humidityChart = new Chart(document.getElementById("humidityGraph"), {
+  type: 'line',
+  data: { labels: [], datasets: [{ label: "Humidity", data: [], borderColor: "red", stepped: true, fill: false }] },
+  options: chartOptions("%")
+});
+
+function chartOptions(unit) {
+  return {
+    responsive: true,
+    plugins: { legend: { labels: { color: 'white' } } },
+    scales: {
+      x: { ticks: { color: "white" }, grid: { color: "#666" } },
+      y: { ticks: { color: "white" }, grid: { color: "#666" }, beginAtZero: true }
+    }
+  };
+}
+
+async function fetchData() {
+  try {
+    const res = await fetch("https://tejas-backend1.onrender.com/api/sensors");
+    const json = await res.json();
+
+    // Update UI
+    document.getElementById("ldr").innerText = json.ldr;
+    document.getElementById("temp").innerText = json.temp;
+    document.getElementById("smoke").innerText =(json.smoke?"Not Detected":"Detected");
+    document.getElementById("timestamp").innerText = json.timestamp;
+
+    const statusEl = document.getElementById("status");
+    if (json.fireDetected) {
+      statusEl.innerText = "🔥 Fire Detected!";
+      statusEl.style.color = "red";
+      alert("🔥 Fire Detected!");
+    } else {
+      statusEl.innerText = "✅ Safe";
+      statusEl.style.color = "lightgreen";
+    }
+
+    // Update history (keep last 10)
+    history = [
+      ...history.slice(-9),
+      {
+        temp: Number(json.temp),
+        smoke: Number(json.smoke), // binary 0 or 1
+        ldr: Number(json.ldr),
+        humidity:Number(json.humidity),
+        time: new Date().toLocaleTimeString("en-IN", { hour12: false })
+      }
+    ];
+    localStorage.setItem("history", JSON.stringify(history));
+
+    updateCharts();
+  } catch (e) {
+    document.getElementById("status").innerText = "❌ Error fetching data";
+    document.getElementById("status").style.color = "yellow";
+  }
+}
+
+function updateCharts() {
+  const labels = history.map(h => h.time);
+
+  // Update Temperature
+  tempChart.data.labels = labels;
+  tempChart.data.datasets[0].data = history.map(h => h.temp);
+  tempChart.update();
+
+  // Update LDR
+  ldrChart.data.labels = labels;
+  ldrChart.data.datasets[0].data = history.map(h => h.ldr);
+  ldrChart.update();
+
+  // Update Humidity
+  humidityChart.data.labels = labels;
+  humidityChart.data.datasets[0].data = history.map(h => h.humidity);
+  humidityChart.update();
+}
+
+// Clear Button
+document.getElementById("clear").onclick = () => {
+  history = [];
+  localStorage.removeItem("history");
+  updateCharts();
+};
+
+// Initial load + refresh every 10s
+fetchData();
+setInterval(fetchData, 10000);
+
+
+</script>
+
   </body>
 </html>

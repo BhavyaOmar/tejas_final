@@ -45,7 +45,7 @@ function addSensor() {
           <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Temperature:</strong> ${newSensor.temp}°C</p>
           <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Humidity:</strong> ${newSensor.humidity}%</p>
           <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Smoke:</strong> ${newSensor.smoke} ppm</p>
-          <button onclick="viewSensorDetails('${newSensor.id}')" class="btn btn-primary" style="margin-top: 12px; padding: 6px 14px; font-size: 0.8rem;">View Details</button>
+          <a href = "./pages/sensors.html" class="btn btn-primary" style="margin-top: 12px; padding: 6px 14px; font-size: 0.8rem;text-decoration:none;color:white;">View Details</a>
         </div>`);
         // Center map on new sensor
         map.setView([lat, lng], 15);
@@ -98,7 +98,7 @@ function addSensor() {
                         <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Temperature:</strong> ${sensor.temp}°C</p>
                         <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Humidity:</strong> ${sensor.humidity}%</p>
                         <p style="margin: 6px 0; font-size: 0.9rem;"><strong>Smoke:</strong> ${sensor.smoke} ppm</p>
-                        <button onclick="viewSensorDetails('${sensor.id}')" class="btn btn-primary" style="margin-top: 12px; padding: 6px 14px; font-size: 0.8rem;">View Details</button>
+                        <a href="./pages/sensors.html" class="btn btn-primary" style="margin-top: 12px; padding: 6px 14px; font-size: 0.8rem;text-decoration:none;">View Details</a>
                     </div>
                 `;
                 
@@ -113,36 +113,6 @@ function addSensor() {
                 case 'critical': return '#ef4444';
                 case 'offline': return '#64748b';
                 default: return '#64748b';
-            }
-        }
-
-        // Simple Router
-        function router() {
-            const hash = window.location.hash.slice(1) || 'home';
-            
-            // Hide all pages
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Remove active class from nav links
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.remove('active');
-            });
-            
-            // Show current page
-            const currentPageElement = document.getElementById(hash);
-            if (currentPageElement) {
-                currentPageElement.classList.add('active');
-                document.querySelector(`[href="#${hash}"]`).classList.add('active');
-                currentPage = hash;
-                
-                // Load page-specific content
-                if (hash === 'sensors') {
-                    loadSensorsPage();
-                } else if (hash === 'alerts') {
-                    loadAlertsPage();
-                }
             }
         }
 
@@ -339,27 +309,37 @@ function addSensor() {
             document.getElementById('offline-count').textContent = offline;
         }
 
-        // Initialize everything
-        window.addEventListener('load', function() {
-            initMap();
-            router();
-            simulateRealTimeUpdates();
-        });
+  const temp = document.getElementById("temp").getContext("2d");
+  const humidity = document.getElementById("humidity").getContext("2d");
+  const ldr = document.getElementById("ldr").getContext("2d");
+  const smoke = document.getElementById("smoke").getContext("2d");
 
-        // Handle navigation
-        window.addEventListener('hashchange', router);
-
-        // Handle navigation clicks
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('nav-link')) {
-                e.preventDefault();
-                window.location.hash = e.target.getAttribute('href');
-            }
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('sensor-modal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
-            }
-        });
+  // Temperature Chart 
+  const tempChart = new Chart(temp, {
+    type: "line",
+    data: {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], // X-axis labels
+      datasets: [
+        {
+          label: "Sensor Data",
+          data: [10, 20, 15, 25, 30, 40], // Y-axis values
+          borderColor: "blue",
+          backgroundColor: "rgba(0, 0, 255, 0.2)",
+          fill: true,
+          tension: 0.4, // makes the line smooth
+          pointRadius: 5, // size of data points
+          pointBackgroundColor: "red",
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true },
+      },
+      scales: {
+        x: { title: { display: true, text: "Months" } },
+        y: { title: { display: true, text: "Values" } },
+      },
+    },
+  });
