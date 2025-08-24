@@ -11,18 +11,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 let latestData = null;
 
 app.post('/api/sensors', async (req, res) => {
-  const { ldr, temp, smoke } = req.body;
+  const { ldr, temp, smoke, humdity } = req.body;
 
-  if (!ldr || !temp || !smoke) {
+  if (!ldr || !temp || !smoke ||!humdity) {
     return res.status(400).json({ error: "Missing one or more sensor fields" });
   }
 
-  const fireDetected = Number(temp) > 33 && Number(smoke) == 1 && Number(ldr) >18;
+  const fireDetected = Number(temp) > 33 && Number(smoke) == 0 && Number(ldr) >18 && Number(humdity)<50;
 
   latestData = {
     ldr,
     temp,
     smoke,
+    humdity,
     fireDetected,
     timestamp: new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
   };

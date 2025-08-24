@@ -166,28 +166,7 @@ function addSensor() {
             });
         }
 
-        // Load alerts page
-        function loadAlertsPage() {
-            const allNotifications = document.getElementById('all-notifications');
-            const notifications = [
-                { type: 'critical', text: '🔥 High temperature detected at SNS-003 (45°C)', time: '2 minutes ago' },
-                { type: 'warning', text: '⚠️ Elevated smoke levels at SNS-007 (35 ppm)', time: '15 minutes ago' },
-                { type: 'warning', text: '⚠️ Temperature rising at SNS-002 (32°C)', time: '32 minutes ago' },
-                { type: 'success', text: '✅ Sensor SNS-025 installed successfully at (22.4064, 88.9781)', time: '1 hour ago' },
-                { type: 'info', text: '📱 Status update from Ranger Kumar (ID: RNG-003)', time: '2 hours ago' },
-                { type: 'info', text: '🔧 Sensor SNS-004 offline for maintenance', time: '3 hours ago' },
-                { type: 'success', text: '✅ All systems normal after routine check', time: '4 hours ago' },
-                { type: 'warning', text: '⚠️ Low battery detected at SNS-019 (15% remaining)', time: '5 hours ago' },
-                { type: 'info', text: '📊 Daily sensor data backup completed', time: '1 day ago' }
-            ];
-
-            allNotifications.innerHTML = notifications.map(notif => `
-                <div class="notification-item ${notif.type}" style="margin-bottom: 1rem;">
-                    <div class="notification-text">${notif.text}</div>
-                    <div class="notification-time">${notif.time}</div>
-                </div>
-            `).join('');
-        }
+        
 
         // Sensor details modal
         function viewSensorDetails(sensorId) {
@@ -308,6 +287,21 @@ function addSensor() {
             document.getElementById('critical-count').textContent = critical;
             document.getElementById('offline-count').textContent = offline;
         }
+
+        // Initialize everything
+        window.addEventListener('load', function() {
+            initMap();
+            
+            simulateRealTimeUpdates();
+        });
+
+       
+        // Close modal when clicking outside
+        document.getElementById('sensor-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
 
   const temp = document.getElementById("temp").getContext("2d");
   const humidity = document.getElementById("humidity").getContext("2d");
